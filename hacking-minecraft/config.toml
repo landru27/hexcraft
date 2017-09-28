@@ -1,4 +1,7 @@
 baseURL = "http://example.org/"
 languageCode = "en-us"
-title = "My New Hugo Site"
+title = "Hacking Minecraft"
 theme = "hyde"
+
+[params]
+  description = "an exploration of Java bytecode engineering, improving Minecraft along the way"
