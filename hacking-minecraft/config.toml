@@ -1,7 +1,0 @@
-baseURL = "http://example.org/"
-languageCode = "en-us"
-title = "Hacking Minecraft"
-theme = "hyde"
-
-[params]
-  description = "an exploration of Java bytecode engineering, improving Minecraft along the way"
