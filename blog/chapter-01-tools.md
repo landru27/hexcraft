@@ -93,4 +93,4 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
   * http://www.exploringbinary.com/floating-point-converter/
 
 
-When you are ready, proceed to [Chapter 0x02 -- Weakened Creepers](/hexcraft/blog/chapter-02-weakend-creepers.html).
+When you are ready, proceed to [Chapter 0x02 -- Weakened Creepers](/hexcraft/blog/chapter-02-weakened-creepers.html).
