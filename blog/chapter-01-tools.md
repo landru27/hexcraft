@@ -34,6 +34,8 @@ So, altering the behavior of a Java program is simply a matter of altering the b
 
 ### Method of Operation
 
+First, please note that when I was working on this overall Minecraft hacking project, v1.11.2 was current.  So, to replicate this work first-hand, you will need a pristine Minecraft v1.11.2 .jar, and the v1.11.2 MPC sources.  I'm confident that the same principles will apply to any version of Minecraft, and quite likely some of my hacks if applied to Minecraft v1.12 would occur in nearly (or possibly even exactly) the same areas of the .class files.  But, I have not personally recreated these hacks on anything but v1.11.2.
+
 The general method of operation I employed for these hacks ended up being something like this:
 
 1. unpack the Minecraft .jar file
@@ -48,7 +50,11 @@ The tools I used for this include:
 
 1. commonly-available general-purpose Linux command-line utilities, such as find, grep, sed, and so forth
 1. xxd, a Linux commmand-line utility for hex editing of so-called binary files
-1. the MPC / Forge sources []
+1. the MPC / Forge sources : [installer for v1.11.2](https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.11.2.html) -- (1.11.2-13.20.1.2386)
+1. [BytecodeViewer](https://bytecodeviewer.com/) -- (v2.9.8)
+1. [jd-gui](http://jd.benow.ca/), also on [GitHub](https://github.com/java-decompiler/jd-gui) -- (v1.4.0)
+1. [jboss-javassist](http://jboss-javassist.github.io/javassist/) -- (v3.22.0 (GA))
+1. [a Perl program](https://github.com/landru27/hexcraft) I wrote to improve upon javassist
 1. tech specs / references
   * https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
   * https://en.wikipedia.org/wiki/Java_class_file
@@ -57,10 +63,6 @@ The tools I used for this include:
   * http://www.binaryhexconverter.com/decimal-to-hex-converter
   * http://www.binaryhexconverter.com/ascii-text-to-hex-converter
   * http://www.exploringbinary.com/floating-point-converter/
-1. BytecodeViewer []
-1. jd-gui []
-1. jboss-javassist []
-1. a Perl program I wrote to improve upon javassist
 
 Quite naturally, after a couple of iterations while getting the process worked out, I wrote a shell script to simplify repeated steps.  And by "simplify", I mean make it so I stopped making typos and inadvertently skipping steps.  In other words, I made the process repeatable, which is a part of any good SDLC.  So mentally add the (what I think of as implicit) "shell scripting" to the above set of tools.  Of course, other forms of scripting are available, and you should use whatever scripting you find most suitable to you, your skills, and the task at hand.
 
