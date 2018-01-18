@@ -50,19 +50,20 @@ The tools I used for this include:
 
 1. commonly-available general-purpose Linux command-line utilities, such as find, grep, sed, and so forth
 1. xxd, a Linux commmand-line utility for hex editing of so-called binary files
-1. the MPC / Forge sources : [installer for v1.11.2](https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.11.2.html) -- (1.11.2-13.20.1.2386)
+1. the MPC / Forge sources : [MDK for v1.11.2](https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.11.2.html) -- (1.11.2-13.20.1.2386)
 1. [BytecodeViewer](https://bytecodeviewer.com/) -- (v2.9.8)
 1. [jd-gui](http://jd.benow.ca/), also on [GitHub](https://github.com/java-decompiler/jd-gui) -- (v1.4.0)
 1. [jboss-javassist](http://jboss-javassist.github.io/javassist/) -- (v3.22.0 (GA))
-1. [a Perl program](https://github.com/landru27/hexcraft) I wrote to improve upon javassist
+1. [a Perl program](https://github.com/landru27/hexcraft/tree/master/utils) I wrote to improve upon javassist
+1. [a Java program](https://github.com/landru27/hexcraft/tree/master/utils) I wrote to re-write a class method's stack map
 1. tech specs / references
-  * https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
-  * https://en.wikipedia.org/wiki/Java_class_file
-  * https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
+  * (https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings)
+  * (https://en.wikipedia.org/wiki/Java_class_file)
+  * (https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html)
 1. numeric converters:
-  * http://www.binaryhexconverter.com/decimal-to-hex-converter
-  * http://www.binaryhexconverter.com/ascii-text-to-hex-converter
-  * http://www.exploringbinary.com/floating-point-converter/
+  * (http://www.binaryhexconverter.com/decimal-to-hex-converter)
+  * (http://www.binaryhexconverter.com/ascii-text-to-hex-converter)
+  * (http://www.exploringbinary.com/floating-point-converter)
 
 Quite naturally, after a couple of iterations while getting the process worked out, I wrote a shell script to simplify repeated steps.  And by "simplify", I mean make it so I stopped making typos and inadvertently skipping steps.  In other words, I made the process repeatable, which is a part of any good SDLC.  So mentally add the (what I think of as implicit) "shell scripting" to the above set of tools.  Of course, other forms of scripting are available, and you should use whatever scripting you find most suitable to you, your skills, and the task at hand.
 
@@ -71,28 +72,31 @@ Quite naturally, after a couple of iterations while getting the process worked o
 One of the first things to do in Minecraft is to craft your craftingtable.  One of the first things we need to do is set up an area where we have the proper tools available.  Here are the steps to do that:
 
 1. make a working area
-  * cd ~
-  * cd [whatever folder structure you use for project organization]
-  * mkdir minecraft
-  * cd minecraft
-  * mkdir archive
-  * mkdir craftingtable
-  * mkdir xtra
-1. download and unpackage the MPC sources
-  * ...
-  * ...
-  * ...
-1. download and stash third-party tools
-  * ...
-  * ...
-  * ...
-1. set browser bookmarks for pages you will refer to often
-  * https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
-  * https://en.wikipedia.org/wiki/Java_class_file
-  * https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
-  * http://www.binaryhexconverter.com/decimal-to-hex-converter
-  * http://www.binaryhexconverter.com/ascii-text-to-hex-converter
-  * http://www.exploringbinary.com/floating-point-converter/
+  * `mkdir /choose/your/path/wisely`
+  * `cd /choose/your/path/wisely`
+  * `mkdir minecraft`
+  * `mkdir minecraft/archive`
+  * `mkdir minecraft/craftingtable`
+  * `mkdir minecraft/xtra`
+  * `mkdir minecraft/forge`
+1. download the installation files from the above list of tools; e.g.,
+  * forge-1.11.2-13.20.1.2386-mdk.zip
+  * BytecodeViewer.2.9.8.zip
+  * jd-gui-1.4.0.jar
+  * javassist-3.22.0-GA.zip
+  * javap.pl
+  * ReadWriteClass.java
+1. go through the installation process for each tool
+  1. Forge / MPC
+    * `cd minecraft/forge/`
+    * `unzip ../../forge-1.11.2-13.20.1.2386-mdk.zip`
+    * `mkdir modding`
+    * `mv -i build.gradle  gradlew.bat gradlew gradle modding/`
+    * `cd modding/`
+    * `./gradlew setupDecompWorkspace`
+      * from (http://mcforge.readthedocs.io/en/latest/gettingstarted/) : "This will download a bunch of artifacts from the internet needed to decompile and build Minecraft and forge. This might take some time, as it will download stuff and then decompile Minecraft."
+    * when this is done, the .java source files for the Forge derivative of Minecraft will be in `build/tmp/recompileMc/sources/net/minecraft`
+1. set browser bookmarks for pages the tech specs, references, and numeric converters listed above
 
 
 When you are ready, proceed to [Chapter 0x02 -- Weakened Creepers](/hexcraft/blog/chapter-02-weakened-creepers.html).
