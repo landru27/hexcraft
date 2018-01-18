@@ -57,13 +57,13 @@ The tools I used for this include:
 1. [a Perl program](https://github.com/landru27/hexcraft/tree/master/utils) I wrote to improve upon javassist
 1. [a Java program](https://github.com/landru27/hexcraft/tree/master/utils) I wrote to re-write a class method's stack map
 1. tech specs / references
-  * (https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings)
-  * (https://en.wikipedia.org/wiki/Java_class_file)
-  * (https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html)
+  * [Wikipedia - Java bytecode instruction listings](https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings)
+  * [Wikipedia - Java class file](https://en.wikipedia.org/wiki/Java_class_file)
+  * [Oracle Java spec - Chapter 4. The class File Format](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html)
 1. numeric converters:
-  * (http://www.binaryhexconverter.com/decimal-to-hex-converter)
-  * (http://www.binaryhexconverter.com/ascii-text-to-hex-converter)
-  * (http://www.exploringbinary.com/floating-point-converter)
+  * [Decimal to Hexadecimal Converter](http://www.binaryhexconverter.com/decimal-to-hex-converter)
+  * [Ascii Text to Hexadecimal Converter](http://www.binaryhexconverter.com/ascii-text-to-hex-converter)
+  * [Decimal to Floating-Point Converter](http://www.exploringbinary.com/floating-point-converter)
 
 Quite naturally, after a couple of iterations while getting the process worked out, I wrote a shell script to simplify repeated steps.  And by "simplify", I mean make it so I stopped making typos and inadvertently skipping steps.  In other words, I made the process repeatable, which is a part of any good SDLC.  So mentally add the (what I think of as implicit) "shell scripting" to the above set of tools.  Of course, other forms of scripting are available, and you should use whatever scripting you find most suitable to you, your skills, and the task at hand.
 
@@ -87,15 +87,15 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
   * javap.pl
   * ReadWriteClass.java
 1. go through the installation process for each tool
-  1. Forge / MPC
-    * `cd minecraft/forge/`
-    * `unzip ../../forge-1.11.2-13.20.1.2386-mdk.zip`
-    * `mkdir modding`
-    * `mv -i build.gradle  gradlew.bat gradlew gradle modding/`
-    * `cd modding/`
-    * `./gradlew setupDecompWorkspace`
-      * from (http://mcforge.readthedocs.io/en/latest/gettingstarted/) : "This will download a bunch of artifacts from the internet needed to decompile and build Minecraft and forge. This might take some time, as it will download stuff and then decompile Minecraft."
-    * when this is done, the .java source files for the Forge derivative of Minecraft will be in `build/tmp/recompileMc/sources/net/minecraft`
+   1. Forge / MPC
+      * `cd minecraft/forge/`
+      * `unzip ../../forge-1.11.2-13.20.1.2386-mdk.zip`
+      * `mkdir modding`
+      * `mv -i build.gradle  gradlew.bat gradlew gradle modding/`
+      * `cd modding/`
+      * `./gradlew setupDecompWorkspace`
+        * from (http://mcforge.readthedocs.io/en/latest/gettingstarted/) : "This will download a bunch of artifacts from the internet needed to decompile and build Minecraft and forge. This might take some time, as it will download stuff and then decompile Minecraft."
+      * when this is done, the .java source files for the Forge derivative of Minecraft will be in `build/tmp/recompileMc/sources/net/minecraft`
 1. set browser bookmarks for pages the tech specs, references, and numeric converters listed above
 
 
