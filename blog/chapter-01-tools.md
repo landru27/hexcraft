@@ -77,18 +77,18 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
   * `mkdir minecraft`
   * `mkdir minecraft/archive`
   * `mkdir minecraft/craftingtable`
-  * `mkdir minecraft/xtra`
   * `mkdir minecraft/forge`
+  * `mkdir minecraft/util`
+  * `mkdir minecraft/xtra`
 1. download the installation files from the above list of tools; e.g.,
   * forge-1.12.2-14.23.1.2555-mdk.zip
   * BytecodeViewer.2.9.8.zip
   * jd-gui-1.4.0.jar
   * javassist-3.22.0-GA.zip
-  * javap.pl
-  * ReadWriteClass.java
+  * hexcraft utilities (javap.pl, ReadWriteClass.java)
 1. go through the installation process for each tool
    1. Forge / MPC
-      * `cd minecraft/forge/`
+      * `cd /choose/your/path/wisely/minecraft/forge/`
       * `unzip ../../forge-1.12.2-14.23.1.2555-mdk.zip`
       * `mkdir modding`
       * `mv -i build.gradle  gradlew.bat gradlew gradle modding/`
@@ -96,6 +96,27 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
       * `./gradlew setupDecompWorkspace`
         * from (http://mcforge.readthedocs.io/en/latest/gettingstarted/) : "This will download a bunch of artifacts from the internet needed to decompile and build Minecraft and forge. This might take some time, as it will download stuff and then decompile Minecraft."
       * when this is done, the .java source files for the Forge derivative of Minecraft will be in `build/tmp/recompileMc/sources/net/minecraft`
+   1. BytecodeViewer
+      * `cd /choose/your/path/wisely/minecraft/xtra/`
+      * `mkdir bytecodeviewer`
+      * `cd bytecodeviewer`
+      * `unzip ../../../BytecodeViewer.2.9.8.zip`
+      * `mv -i 'BytecodeViewer 2.9.8.jar' ../../util/BytecodeViewer_2.9.8.jar`
+      * `cd /choose/your/path/wisely`
+      * `java -jar minecraft/util/BytecodeViewer_2.9.8.jar`
+        * the first run will download a number of dependencies; subsequent runs are much faster
+   1. JD-GUI
+      * `cd /choose/your/path/wisely`
+      * `cp -ip jd-gui-1.4.0.jar minecraft/util/`
+   1. JavaAssist
+      * `cd /choose/your/path/wisely/minecraft/xtra`
+      * `unzip ../../javassist-3.22.0-GA.zip`
+      * `cp -ip javassist-3.22.0-GA/javassist.jar ../util/`
+   1. hexcraft utilities
+      * `cd /choose/your/path/wisely/`
+      * `git clone git@github.com:landru27/hexcraft.git`
+      * `cp -ip hexcraft/utils/javap.pl minecraft/util/`
+      * `cp -ip hexcraft/utils/ReadWriteClass.java minecraft/util/`
 1. set browser bookmarks for pages the tech specs, references, and numeric converters listed above
 
 
