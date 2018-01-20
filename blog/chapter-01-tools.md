@@ -34,7 +34,7 @@ So, altering the behavior of a Java program is simply a matter of altering the b
 
 ### Method of Operation
 
-First, please note that when I was working on this overall Minecraft hacking project, v1.11.2 was current.  So, to replicate this work first-hand, you will need a pristine Minecraft v1.11.2 .jar, and the v1.11.2 MPC sources.  I'm confident that the same principles will apply to any version of Minecraft, and quite likely some of my hacks if applied to Minecraft v1.12 would occur in nearly (or possibly even exactly) the same areas of the .class files.  But, I have not personally recreated these hacks on anything but v1.11.2.
+When I began this hacking project, Minecraft v1.11.2 was the current version, and that's what I used throughout.  For this series, I will be working with Minecraft v1.12.2.  I am confident that the concepts and approaches used here will continue to apply for v1.13, or really any version written in Java.
 
 The general method of operation I employed for these hacks ended up being something like this:
 
@@ -50,7 +50,7 @@ The tools I used for this include:
 
 1. commonly-available general-purpose Linux command-line utilities, such as find, grep, sed, and so forth
 1. xxd, a Linux commmand-line utility for hex editing of so-called binary files
-1. the MPC / Forge sources : [MDK for v1.11.2](https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.11.2.html) -- (1.11.2-13.20.1.2386)
+1. the MPC / Forge sources : [MDK for v1.12.2](https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.12.2.html) -- (1.12.2-14.23.1.2555)
 1. [BytecodeViewer](https://bytecodeviewer.com/) -- (v2.9.8)
 1. [jd-gui](http://jd.benow.ca/), also on [GitHub](https://github.com/java-decompiler/jd-gui) -- (v1.4.0)
 1. [jboss-javassist](http://jboss-javassist.github.io/javassist/) -- (v3.22.0 (GA))
@@ -80,7 +80,7 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
   * `mkdir minecraft/xtra`
   * `mkdir minecraft/forge`
 1. download the installation files from the above list of tools; e.g.,
-  * forge-1.11.2-13.20.1.2386-mdk.zip
+  * forge-1.12.2-14.23.1.2555-mdk.zip
   * BytecodeViewer.2.9.8.zip
   * jd-gui-1.4.0.jar
   * javassist-3.22.0-GA.zip
@@ -89,7 +89,7 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
 1. go through the installation process for each tool
    1. Forge / MPC
       * `cd minecraft/forge/`
-      * `unzip ../../forge-1.11.2-13.20.1.2386-mdk.zip`
+      * `unzip ../../forge-1.12.2-14.23.1.2555-mdk.zip`
       * `mkdir modding`
       * `mv -i build.gradle  gradlew.bat gradlew gradle modding/`
       * `cd modding/`
