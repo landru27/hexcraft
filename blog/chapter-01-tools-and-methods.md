@@ -22,7 +22,8 @@ Thus, I set about my first attempt at hacking Minecraft.
 
 My first go at it was classic mod'ing, using Forge.  This was sucessful, but cumbersome.  The mod'ing hook felt heavy to me, particularly because I wanted to make such a small change.  So I switched back to contemplating altering the engine code itself.
 
-### Hexxing
+
+### hexxing
 
 Any executale is, of course, just a file, and a file is just a bunch of bytes.  There is nothing magical about software.  A program is a set of instructions to be fed to the CPU.  Working exclusively in high-level languages like C, Java, Perl, and Ruby can distance one from what's really going on inside the CPU, and a realization or a reminder of how `print("Hello world!")` actually puts the characters `H-e-l-l-o- -W-o-r-l-d-!` on the screen can close that distance, de-mystify the software, and deepen one's understanding of programming.
 
@@ -32,7 +33,8 @@ So, altering the behavior of a Java program is simply a matter of altering the b
 
 ... "simple" being determined, of course, by how extensive is the alteration you want to make.  In the course of this blog series, we will go from a simple, single-byte alteration to adding a new method to the Java class file.
 
-### Method of Operation
+
+### method of procedure
 
 When I began this hacking project, Minecraft v1.11.2 was the current version, and that's what I used throughout.  For this series, I will be working with Minecraft v1.12.2.  I am confident that the concepts and approaches used here will continue to apply for v1.13, or really any version written in Java.
 
@@ -53,7 +55,7 @@ The tools I used for this include:
 1. the MCP / Forge sources : [MDK for v1.12.2](https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.12.2.html) -- (1.12.2-14.23.1.2555)
 1. [BytecodeViewer](https://bytecodeviewer.com/) -- (v2.9.8)
 1. [jboss-javassist](http://jboss-javassist.github.io/javassist/) -- (v3.22.0 (GA))
-1. [a Perl program](https://github.com/landru27/hexcraft/tree/master/utils) I wrote to improve upon javassist
+1. [a Perl program](https://github.com/landru27/hexcraft/tree/master/utils) I wrote to improve upon javap
 1. [a Java program](https://github.com/landru27/hexcraft/tree/master/utils) I wrote to re-write a class method's stack map
 1. tech specs / references
   * [Wikipedia - Java bytecode instruction listings](https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings)
@@ -63,22 +65,23 @@ The tools I used for this include:
   * [Decimal to Hexadecimal Converter](http://www.binaryhexconverter.com/decimal-to-hex-converter)
   * [Ascii Text to Hexadecimal Converter](http://www.binaryhexconverter.com/ascii-text-to-hex-converter)
   * [Decimal to Floating-Point Converter](http://www.exploringbinary.com/floating-point-converter)
+1. shell scripting
+  * to make the process consistent and repeatable; could be any suitable form of scripting, but shell is my bailiwick
 
-Quite naturally, after a couple of iterations while getting the process worked out, I wrote a shell script to simplify repeated steps.  And by "simplify", I mean make it so I stopped making typos and inadvertently skipping steps.  In other words, I made the process repeatable, which is a part of any good SDLC.  So mentally add the (what I think of as implicit) "shell scripting" to the above set of tools.  Of course, other forms of scripting are available, and you should use whatever scripting you find most suitable to you, your skills, and the task at hand.
 
-### Craft Your Craftingtable
+### craft your craftingtable
 
-One of the first things to do in Minecraft is to craft your craftingtable.  One of the first things we need to do is set up an area where we have the proper tools available.  Here are the steps to do that:
+One of the first things to do in Minecraft is to craft your craftingtable.  One of the first things we need to do is set up an area where we have the proper tools available.  Below are the steps to do that.  These steps set things up in your home directory (~), but of course you should adapt that to suit your needs.
 
 1. make a working area
-  * `mkdir /choose/your/path/wisely`
-  * `cd /choose/your/path/wisely`
-  * `mkdir minecraft`
-  * `mkdir minecraft/archive`
-  * `mkdir minecraft/craftingtable`
-  * `mkdir minecraft/forge`
-  * `mkdir minecraft/util`
-  * `mkdir minecraft/xtra`
+  * `mkdir ~/hexcraft-blog/`
+  * `cd ~/hexcraft-blog/`
+  * `mkdir minecraft/`
+  * `mkdir minecraft/archive/`
+  * `mkdir minecraft/craftingtable/`
+  * `mkdir minecraft/forge/`
+  * `mkdir minecraft/util/`
+  * `mkdir minecraft/xtra/`
 1. download the installation files from the above list of tools; e.g.,
   * forge-1.12.2-14.23.1.2555-mdk.zip
   * BytecodeViewer.2.9.8.zip
@@ -86,33 +89,35 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
   * hexcraft utilities (javap.pl, ReadWriteClass.java)
 1. go through the installation process for each tool
    1. Forge
-      * `cd /choose/your/path/wisely/minecraft/forge/`
+      * `cd ~/hexcraft-blog/minecraft/forge/`
       * `unzip ../../forge-1.12.2-14.23.1.2555-mdk.zip`
-      * `mkdir modding`
+      * `mkdir modding/`
       * `mv -i build.gradle  gradlew.bat gradlew gradle modding/`
       * `cd modding/`
       * `./gradlew setupDecompWorkspace`
         * from (http://mcforge.readthedocs.io/en/latest/gettingstarted/) : "This will download a bunch of artifacts from the internet needed to decompile and build Minecraft and forge. This might take some time, as it will download stuff and then decompile Minecraft."
       * when this is done, the .java source files for the Forge derivative of Minecraft will be in `build/tmp/recompileMc/sources/net/minecraft`
    1. BytecodeViewer
-      * `cd /choose/your/path/wisely/minecraft/xtra/`
-      * `mkdir bytecodeviewer`
-      * `cd bytecodeviewer`
+      * `cd ~/hexcraft-blog/minecraft/xtra/`
+      * `mkdir bytecodeviewer/`
+      * `cd bytecodeviewer/`
       * `unzip ../../../BytecodeViewer.2.9.8.zip`
       * `mv -i 'BytecodeViewer 2.9.8.jar' ../../util/BytecodeViewer_2.9.8.jar`
-      * `cd /choose/your/path/wisely`
+      * `cd ~/hexcraft-blog/`
       * `java -jar minecraft/util/BytecodeViewer_2.9.8.jar`
         * the first run will download a number of dependencies; subsequent runs are much faster
    1. JavaAssist
-      * `cd /choose/your/path/wisely/minecraft/xtra`
+      * `cd ~/hexcraft-blog/minecraft/xtra/`
       * `unzip ../../javassist-3.22.0-GA.zip`
       * `cp -ip javassist-3.22.0-GA/javassist.jar ../util/`
    1. hexcraft utilities
-      * `cd /choose/your/path/wisely/`
+      * `cd ~/hexcraft-blog/`
       * `git clone git@github.com:landru27/hexcraft.git`
       * `cp -ip hexcraft/utils/javap.pl minecraft/util/`
       * `cp -ip hexcraft/utils/ReadWriteClass.java minecraft/util/`
 1. set browser bookmarks for pages the tech specs, references, and numeric converters listed above
 
+
+### next chapter
 
 When you are ready, proceed to [Chapter 0x02 -- Weakened Creepers](/hexcraft/blog/chapter-02-weakened-creepers.html).

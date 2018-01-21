@@ -2,7 +2,7 @@
 
 ## Chapter 0x02 - Weakened Creepers
 
-### Intro
+### intro
 
 Now we start the actual hacking.
 
@@ -17,8 +17,8 @@ Both for searching within the Minecraft engine for where to make the change we w
 
 ```
 cd ~/hexcraft-blog/minecraft/craftingtable/
-mkdir chapter-02-weakened-creepers
-cd chapter-02-weakened-creepers/
+mkdir chapter-02-weakened-creepers/
+cd    chapter-02-weakened-creepers/
 
 ## e.g., on my Mac, Minecraft is installed in my user's 'Library/Application Support/minecraft' directory
 cp -ip '/Users/USERNAME/Library/Application Support/minecraft/versions/1.12.2/1.12.2.jar' ./1.12.2.jar
@@ -52,7 +52,7 @@ Thus, we need a way to find the correct .class file.
 
 In non-obfuscated .class files, there are structures that preserve the variable names used in the .java source code, so we could normally search for those in the .class file, or in the output of `strings` on the .class file.  But part of Mojang's obfuscation is to replace every variable name with the unicode snowman character.  In a .class file, variable names are just handy references that tie back to the source code; the .class file has a different way to refer to each variable individually, which we will see more of in later chapters.
 
-In both non-obfuscated and obfuscated .class files, any use of classes outside of itself must be done with an actual name for that other class, so we could normally search for .class files that make reference to all the classes that show up in `.../entity/monster/EntityCreeper.java`.  But part of Mojang's obfuscation is to obfuscate *all* the class names, so while the references are in tact, they refer to other classes that have themselves had their names obfuscated.
+In both non-obfuscated and obfuscated .class files, any use of classes outside of itself must be done with an actual name for that other class, so we could normally search for .class files that make reference to all the classes that show up in `.../entity/monster/EntityCreeper.java`.  But part of Mojang's obfuscation is to obfuscate *all* the class names, so while the references are intact, they refer to other classes that have themselves had their names obfuscated.
 
 We need to search for things relatively unique to our target class file that cannot withstand obfuscation.
 
@@ -69,8 +69,7 @@ If you ever thought having meaningful function and variable names was unneccsary
 
 So, despite the obfuscation, we can decompile the target .class file.  With effort, we can see what it is doing.  Issue: `java -jar ../../util/BytecodeViewer_2.9.8.jar`, and use the File menu to Add 'acs.class'.  The BytecodeViewer inteface is not the most intuitive thing, but one gets the hang of it with some poking around.  By default, BytecodeViewer presents us with two alternative decompilations of our selected class.  One is good for some things, and the other is good for other things.  Together, they tell us a lot about the target .class file.
 
-As example of the kind of brain-hurt I mentioned just above, we see near the top of the JD-GUI view of acs.class code like this:
-
+As example of the kind of brain-hurt I mentioned just above, code like this found near the top of the JD-GUI view of acs.class ...
 ```
 protected void r()
 {
@@ -87,7 +86,7 @@ protected void r()
 }
 ```
 
-is exaclty what I mean.  Overall, this looks just like the sort of initialization code one would see near the top of most any class.  Bits of it are even crystal clear: there's no question about the numbers, and the booleans `true` and `false`.  But with class names like `br`, `aab`, and `aed`, and with method names like `r`, `wz`, `yj`, and `xl`, we have **no idea** what could be going on here.
+... is exaclty what I mean.  Overall, this looks just like the sort of initialization code one would see near the top of most any class.  Bits of it are even crystal clear: there's no question about the numbers, and the booleans `true` and `false`.  But with class names like `br`, `aab`, and `aed`, and with method names like `r`, `wz`, `yj`, and `xl`, we have **no idea** what could be going on here.
 
 Thank goodness (and a lot of work by dedicated people) for the MCP / Forge sources, which we can correlate to what we see in this decompilation, in order to make some semblence of sense of it.
 
@@ -115,7 +114,7 @@ That "3" is what we want to change.  It's a small value, and we want to change t
 
 ### read the existing bytecode to understand the actual program flow
 
-Here is where we can make good use of the Bytecode view of acs.class.  The JD-GUI view looks like normal .java source code, and we see things like `private int bA = 3;`.  In reality, operations such as assignment don't take place anywhere except inside of a function.  The code `bA = 3` is really shorthand for "during instantiation, assign bA the value of 3".  Instantiation, of course, takes place in the constructor, whose name, while obfuscated, must match the class name.  And, indeed, we see a method `public acs(amu arg0)`.  Checking the MCP / Forge source code, we see that EntityCreeper does in fact have a 1-argument constructor (from which, by the way, we can conclude that the name `amu` is the obfuscated name for the World class).
+Here is where we can make good use of the Bytecode view of acs.class.  The JD-GUI view looks like normal .java source code, and we see things like `private int bA = 3;`.  In reality, operations such as assignment don't take place anywhere except inside of a function.  The code `bA = 3` is really shorthand for "during instantiation, assign bA the value of 3".  Instantiation, of course, takes place in the constructor, whose name, even though obfuscated, must match the class name.  And, indeed, we see a method `public acs(amu arg0)`.  Checking the MCP / Forge source code, we see that EntityCreeper does in fact have a 1-argument constructor (from which, by the way, we can conclude that the name `amu` is the obfuscated name for the World class).
 
 In that constructor method, we find things that reflect what we see in the source code for the constructor, such as:
 ```
@@ -129,7 +128,7 @@ which because of the numbers involved sure looks like it corresponds to:
 a(0.6F, 1.7F);
 ```
 
-In fact, they do correspond.  `acs a()` is clearly a call do `a()` within `acs`, and `(FF)V` indicates that two floats are passed.  This matches very well with `a(0.6F, 1.7F)`, an in-class call to `a()`, passing two Floats.  The `ldc` lines are clearly involved, because they provide the specific values of those Floats.  This all ties together by reading and understanding the **bytecode** that corresponds to these operations.  The Wikipedia references I included in Chapter 0x01 are very valuable for reading Java bytecode, and after doing it enough, one begins to beable to read it like any language one is familiar with.
+In fact, they do correspond.  `acs a()` is clearly a call do `a()` within `acs`, and `(FF)V` indicates that two floats are passed.  This matches very well with `a(0.6F, 1.7F)`, an in-class call to `a()`, passing two Floats.  The `ldc` lines are clearly involved, because they provide the specific values of those Floats.  This all ties together by reading and understanding the **bytecode** that corresponds to these operations.  The Wikipedia references I included in Chapter 0x01 are very valuable for reading Java bytecode, and after doing it enough, one begins to be able to read it like any language one is familiar with.
 
 Using the Wikipedia bytecode reference, we see that the opcodes for the above are:
 ```
@@ -167,9 +166,9 @@ b5 0019           [putfield 25    [acs bA, I]]
 
 Notice a couple of things about `bipush` and `iconst_3`.  First, `bipush` is like `ldc` in that it is followed by an argument byte, but *unlike* `ldc` because that byte is the actual value to use, not a reference to the constant pool.  Second, notice that `iconst_3` is *not* followed by an argument byte.  One thing to notice about the collection of Java opcodes is that those dealing with the frequently-used values of 0, 1, 2, and 3 have bytecodes that *imply* these argument values.  For integers, there are opcodes that imply -1, 4, and 5 as well.  At the cost of precious space on the bytecode table (there can only be a maximum of 256 distinct bytecodes), Java cuts in half the number of program bytes that need to be processed by the JVM in order to deal with the most frequently used values.  Just think about the number of times while writing a program you set something to '0' or '1'.  The space and execution time saved adds up when the JVM can do these things with 1 byte instead of 2 bytes.
 
-Like with `ldc` and `invokevirtual`, `putfield` takes a reference to the constant pool; that's what the '23' and '25' are.  These resolve to a descriptor for a variable.  `putfield` pops from the stack the value pushed there by `bipush` / `iconst_3`, storing it in the indicated variable.
+Like with `ldc` and `invokevirtual`, `putfield` takes a reference to the constant pool; that's what the '23' and '25' are.  These each resolve to a distinct descriptor for a variable.  `putfield` pops from the stack the value pushed there by `bipush` / `iconst_3`, storing it in the indicated variable.
 
-So, to change the '3' to a '1', we do indeed need to make a 1-byte change, ...  But we need to change the `06` for `iconst_3` to `04` for `iconst_1`.  That will push a '1' onto the stack, which `putfield` will pop and store in `acs.bA`.
+So, in order to change the "3" to a "1", we do indeed need to make a 1-byte change, ...  But we need to change the `06` for `iconst_3` to `04` for `iconst_1`.  That will push a '1' onto the stack, which `putfield` will pop and store in `acs.bA`.
 
 
 ### alter the bytecode (dump the class file to text-hex, edit, and reconstitute into binary)
