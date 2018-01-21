@@ -52,7 +52,6 @@ The tools I used for this include:
 1. xxd, a Linux commmand-line utility for hex editing of so-called binary files
 1. the MPC / Forge sources : [MDK for v1.12.2](https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.12.2.html) -- (1.12.2-14.23.1.2555)
 1. [BytecodeViewer](https://bytecodeviewer.com/) -- (v2.9.8)
-1. [jd-gui](http://jd.benow.ca/), also on [GitHub](https://github.com/java-decompiler/jd-gui) -- (v1.4.0)
 1. [jboss-javassist](http://jboss-javassist.github.io/javassist/) -- (v3.22.0 (GA))
 1. [a Perl program](https://github.com/landru27/hexcraft/tree/master/utils) I wrote to improve upon javassist
 1. [a Java program](https://github.com/landru27/hexcraft/tree/master/utils) I wrote to re-write a class method's stack map
@@ -83,7 +82,6 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
 1. download the installation files from the above list of tools; e.g.,
   * forge-1.12.2-14.23.1.2555-mdk.zip
   * BytecodeViewer.2.9.8.zip
-  * jd-gui-1.4.0.jar
   * javassist-3.22.0-GA.zip
   * hexcraft utilities (javap.pl, ReadWriteClass.java)
 1. go through the installation process for each tool
@@ -105,9 +103,6 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
       * `cd /choose/your/path/wisely`
       * `java -jar minecraft/util/BytecodeViewer_2.9.8.jar`
         * the first run will download a number of dependencies; subsequent runs are much faster
-   1. JD-GUI
-      * `cd /choose/your/path/wisely`
-      * `cp -ip jd-gui-1.4.0.jar minecraft/util/`
    1. JavaAssist
       * `cd /choose/your/path/wisely/minecraft/xtra`
       * `unzip ../../javassist-3.22.0-GA.zip`
