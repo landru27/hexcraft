@@ -17,3 +17,6 @@ The last thing I want to note before getting into the hacking itself is that in 
 (Note that by "off-line", I don't simply mean single-player mode; I mean with no network connection.  The Minecraft launcher itself will look for updates, indicated by checksum mismatches.  So before launching Minecraft, unplug your network cable, turn off WiFi, or whatever.)
 
 One final, common-sense note of caution: make backups before you begin, and at sensible stages along the way.  That's only prudent, and lets you hack fearlessly, as you will be able to revert to a known-good state if things go haywire.
+
+
+Proceed to [Chapter 0x01 -- Tools and Methods](/hexcraft/blog/chapter-01-tools-and-methods.html) to get an overview and to set up your workbench-- er, crafting table.
