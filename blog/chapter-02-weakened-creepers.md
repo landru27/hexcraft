@@ -30,7 +30,7 @@ mv -i 1.12.2.jar 1.12.2.jar--orig
 
 ### find the class file or files involved in the logic to be changed
 
-We begin with a bit of detective work.  We need to think about what it is we want to change about the Minecraft engine, and search the Forge/MPC souce files for candidates.  In doing so, it is useful to search for both (1) likely .java file **names**, and (2) likely .java file **contents**.
+We begin with a bit of detective work.  We need to think about what it is we want to change about the Minecraft engine, and search the MCP / Forge souce files for candidates.  In doing so, it is useful to search for both (1) likely .java file **names**, and (2) likely .java file **contents**.
 
 For hacking creepers' explosion strength, it makes sense to look for source files with 'creeper' in the name, and it makes sense to look for source files with contents related to explosions.  Some searches I used for doing this include:
 
@@ -56,7 +56,7 @@ In both non-obfuscated and obfuscated .class files, any use of classes outside o
 
 We need to search for things relatively unique to our target class file that cannot withstand obfuscation.
 
-After trying several things, I hit upon a few reliable markers.  One of them is the NBT tags that a class makes use of.  NBT data is stored with an ordinary name (the 'N' in NBT) to mark its associated data in the NBT files (usually, .dat files).  The one that works best for the task at hand is "ExplosionRadius".  It stands to reason, as not many things in the Minecraft world have an explosion radius, and it can be confirmed with another grep of the Forge sources: `grep -rl ExplosionRadius ~/hexcraft-blog/minecraft/forge/modding/build/tmp/recompileMc/sources/net/` finds only one file: the same `.../client/model/ModelCreeper.java` in which we found `private int explosionRadius = 3;`.  Golden.
+After trying several things, I hit upon a few reliable markers.  One of them is the NBT tags that a class makes use of.  NBT data is stored with an ordinary name (the 'N' in NBT) to mark its associated data in the NBT files (usually, .dat files).  The one that works best for the task at hand is "ExplosionRadius".  It stands to reason, as not many things in the Minecraft world have an explosion radius, and it can be confirmed with another grep of the MCP / Forge sources: `grep -rl ExplosionRadius ~/hexcraft-blog/minecraft/forge/modding/build/tmp/recompileMc/sources/net/` finds only one file: the same `.../client/model/ModelCreeper.java` in which we found `private int explosionRadius = 3;`.  Golden.
 
 Back in `craftingtable/chapter-02-weakened-creepers/', when we `grep ExplosionRadius *` the only .class file listed is `acs.class`.  That file will be the subject of our edits, below.
 
@@ -89,7 +89,7 @@ protected void r()
 
 is exaclty what I mean.  Overall, this looks just like the sort of initialization code one would see near the top of most any class.  Bits of it are even crystal clear: there's no question about the numbers, and the booleans `true` and `false`.  But with class names like `br`, `aab`, and `aed`, and with method names like `r`, `wz`, `yj`, and `xl`, we have **no idea** what could be going on here.
 
-Thank goodness (and a lot of work by dedicated people) for the Forge/MPC sources, which we can correlate to what we see in this decompilation, in order to make some semblence of sense of it.
+Thank goodness (and a lot of work by dedicated people) for the MCP / Forge sources, which we can correlate to what we see in this decompilation, in order to make some semblence of sense of it.
 
 For example, the line:
 ```
@@ -101,7 +101,7 @@ is this call to add avoidance behavior to a creeper's AI rules:
 this.tasks.addTask(3, new EntityAIAvoidEntity(this, EntityOcelot.class, 6.0F, 1.0D, 1.2D));
 ```
 
-By the same token we use the Forge/MPC sources to see that the area of code we are interested in is here:
+By the same token we use the MCP / Forge sources to see that the area of code we are interested in is here:
 ```
 private int bx;
 private int by;
@@ -115,7 +115,7 @@ That "3" is what we want to change.  It's a small value, and we want to change t
 
 ### read the existing bytecode to understand the actual program flow
 
-Here is where we can make good use of the Bytecode view of acs.class.  The JD-GUI view looks like normal .java source code, and we see things like `private int bA = 3;`.  In reality, operations such as assignment don't take place anywhere except inside of a function.  The code `bA = 3` is really shorthand for "during instantiation, assign bA the value of 3".  Instantiation, of course, takes place in the constructor, whose name, while obfuscated, must match the class name.  And, indeed, we see a method `public acs(amu arg0)`.  Checking the Forge/MPC source code, we see that EntityCreeper does in fact have a 1-argument constructor (from which, by the way, we can conclude that the name `amu` is the obfuscated name for the World class).
+Here is where we can make good use of the Bytecode view of acs.class.  The JD-GUI view looks like normal .java source code, and we see things like `private int bA = 3;`.  In reality, operations such as assignment don't take place anywhere except inside of a function.  The code `bA = 3` is really shorthand for "during instantiation, assign bA the value of 3".  Instantiation, of course, takes place in the constructor, whose name, while obfuscated, must match the class name.  And, indeed, we see a method `public acs(amu arg0)`.  Checking the MCP / Forge source code, we see that EntityCreeper does in fact have a 1-argument constructor (from which, by the way, we can conclude that the name `amu` is the obfuscated name for the World class).
 
 In that constructor method, we find things that reflect what we see in the source code for the constructor, such as:
 ```

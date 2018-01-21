@@ -20,7 +20,7 @@ So, programmer that I am, I got to thinking: I wonder how the explosive power of
 
 Thus, I set about my first attempt at hacking Minecraft.
 
-My first go at it was classic mod'ing, using MPC / Forge.  This was sucessful, but cumbersome.  The mod'ing hook felt heavy to me, particularly because I wanted to make such a small change.  So I switched back to contemplating altering the engine code itself.
+My first go at it was classic mod'ing, using Forge.  This was sucessful, but cumbersome.  The mod'ing hook felt heavy to me, particularly because I wanted to make such a small change.  So I switched back to contemplating altering the engine code itself.
 
 ### Hexxing
 
@@ -39,9 +39,9 @@ When I began this hacking project, Minecraft v1.11.2 was the current version, an
 The general method of operation I employed for these hacks ended up being something like this:
 
 1. unpack the Minecraft .jar file
-1. find the class file or files involved in the logic I wanted to change (primarily using the MPC source code)
+1. find the class file or files involved in the logic I wanted to change (primarily using the MCP / Forge source code)
 1. find the area within the appropriate class file(s) where that logic resides (using a decompiled view of those class file(s))
-1. read the existing bytecode to understand the actual program flow (which can differ from the MPC sources, for various reasons)
+1. read the existing bytecode to understand the actual program flow (which can differ from the MCP / Forge sources, for various reasons)
 1. determine the bytecode changes that will implement the desired logic change
 1. alter the bytecode (dump the class file to text-hex, edit, and reconstitute into binary)
 1. repackage the Minecraft .jar file
@@ -50,7 +50,7 @@ The tools I used for this include:
 
 1. commonly-available general-purpose Linux command-line utilities, such as find, grep, sed, and so forth
 1. xxd, a Linux commmand-line utility for hex editing of so-called binary files
-1. the MPC / Forge sources : [MDK for v1.12.2](https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.12.2.html) -- (1.12.2-14.23.1.2555)
+1. the MCP / Forge sources : [MDK for v1.12.2](https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.12.2.html) -- (1.12.2-14.23.1.2555)
 1. [BytecodeViewer](https://bytecodeviewer.com/) -- (v2.9.8)
 1. [jboss-javassist](http://jboss-javassist.github.io/javassist/) -- (v3.22.0 (GA))
 1. [a Perl program](https://github.com/landru27/hexcraft/tree/master/utils) I wrote to improve upon javassist
@@ -85,7 +85,7 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
   * javassist-3.22.0-GA.zip
   * hexcraft utilities (javap.pl, ReadWriteClass.java)
 1. go through the installation process for each tool
-   1. Forge / MPC
+   1. Forge
       * `cd /choose/your/path/wisely/minecraft/forge/`
       * `unzip ../../forge-1.12.2-14.23.1.2555-mdk.zip`
       * `mkdir modding`
