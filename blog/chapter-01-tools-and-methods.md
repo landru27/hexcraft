@@ -74,47 +74,48 @@ The tools I used for this include:
 One of the first things to do in Minecraft is to craft your craftingtable.  One of the first things we need to do is set up an area where we have the proper tools available.  Below are the steps to do that.  These steps set things up in your home directory (~), but of course you should adapt that to suit your needs.
 
 1. make a working area
-  * `mkdir ~/hexcraft-blog/`
-  * `cd ~/hexcraft-blog/`
-  * `mkdir minecraft/`
-  * `mkdir minecraft/archive/`
-  * `mkdir minecraft/craftingtable/`
-  * `mkdir minecraft/forge/`
-  * `mkdir minecraft/util/`
-  * `mkdir minecraft/xtra/`
-1. download the installation files from the above list of tools; e.g.,
+  * `mkdir ~/hmcb/`  (short for 'hacking-minecraft-blog', but use whatever makes sense to you)
+  * `cd ~/hmcb/`
+  * `mkdir tmp/`
+  * `mkdir archive/`
+  * `mkdir craftingtable/`
+  * `mkdir forge/`
+  * `mkdir util/`
+1. clone this repo into the working area
+  * `cd ~/hmcb/`
+  * `git clone git@github.com:landru27/hexcraft.git`
+1. download the installation files from the above list of tools; save them into `~/hmcb/tmp/`
   * forge-1.12.2-14.23.1.2555-mdk.zip
   * BytecodeViewer.2.9.8.zip
   * javassist-3.22.0-GA.zip
-  * hexcraft utilities (javap.pl, ReadWriteClass.java)
 1. go through the installation process for each tool
    1. Forge
-      * `cd ~/hexcraft-blog/minecraft/forge/`
-      * `unzip ../../forge-1.12.2-14.23.1.2555-mdk.zip`
+      * `cd ~/hmcb/forge/`
+      * `unzip ../tmp/forge-1.12.2-14.23.1.2555-mdk.zip`
       * `mkdir modding/`
       * `mv -i build.gradle  gradlew.bat gradlew gradle modding/`
       * `cd modding/`
       * `./gradlew setupDecompWorkspace`
         * from (http://mcforge.readthedocs.io/en/latest/gettingstarted/) : "This will download a bunch of artifacts from the internet needed to decompile and build Minecraft and forge. This might take some time, as it will download stuff and then decompile Minecraft."
-      * when this is done, the .java source files for the Forge derivative of Minecraft will be in `build/tmp/recompileMc/sources/net/minecraft`
+        * gradle has a caching mechanism, so if you want/need to redo this step, you can `mv -i ~/.gradle/caches/ ~/.gradle/caches.prev.001` or similar
+      * when this is done, the .java source files for the Forge derivative of Minecraft will be in `~/hmcb/forge/modding/build/tmp/recompileMc/sources/net/minecraft/`
    1. BytecodeViewer
-      * `cd ~/hexcraft-blog/minecraft/xtra/`
+      * `cd ~/hmcb/tmp/`
       * `mkdir bytecodeviewer/`
       * `cd bytecodeviewer/`
-      * `unzip ../../../BytecodeViewer.2.9.8.zip`
+      * `unzip ../BytecodeViewer.2.9.8.zip`
       * `mv -i 'BytecodeViewer 2.9.8.jar' ../../util/BytecodeViewer_2.9.8.jar`
-      * `cd ~/hexcraft-blog/`
-      * `java -jar minecraft/util/BytecodeViewer_2.9.8.jar`
+      * `cd ~/hmcb/`
+      * `java -jar util/BytecodeViewer_2.9.8.jar`
         * the first run will download a number of dependencies; subsequent runs are much faster
    1. JavaAssist
-      * `cd ~/hexcraft-blog/minecraft/xtra/`
-      * `unzip ../../javassist-3.22.0-GA.zip`
+      * `cd ~/hmcb/tmp/`
+      * `unzip javassist-3.22.0-GA.zip`
       * `cp -ip javassist-3.22.0-GA/javassist.jar ../util/`
    1. hexcraft utilities
-      * `cd ~/hexcraft-blog/`
-      * `git clone git@github.com:landru27/hexcraft.git`
-      * `cp -ip hexcraft/utils/javap.pl minecraft/util/`
-      * `cp -ip hexcraft/utils/ReadWriteClass.java minecraft/util/`
+      * `cd ~/hmcb/`
+      * `cp -ip hexcraft/utils/javap.pl util/`
+      * `cp -ip hexcraft/utils/ReadWriteClass.java util/`
 1. set browser bookmarks for pages the tech specs, references, and numeric converters listed above
 
 
