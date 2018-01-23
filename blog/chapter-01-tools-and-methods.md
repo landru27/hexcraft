@@ -96,7 +96,7 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
       * `mv -i build.gradle  gradlew.bat gradlew gradle modding/`
       * `cd modding/`
       * `./gradlew setupDecompWorkspace`
-        * from (http://mcforge.readthedocs.io/en/latest/gettingstarted/) : "This will download a bunch of artifacts from the internet needed to decompile and build Minecraft and forge. This might take some time, as it will download stuff and then decompile Minecraft."
+        * from [Getting Started with Forge](http://mcforge.readthedocs.io/en/latest/gettingstarted/) : "This will download a bunch of artifacts from the internet needed to decompile and build Minecraft and forge. This might take some time, as it will download stuff and then decompile Minecraft."
         * gradle has a caching mechanism, so if you want/need to redo this step, you can `mv -i ~/.gradle/caches/ ~/.gradle/caches.prev.001` or similar
       * when this is done, the .java source files for the Forge derivative of Minecraft will be in `~/hmcb/forge/modding/build/tmp/recompileMc/sources/net/minecraft/`
    1. BytecodeViewer
@@ -104,7 +104,7 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
       * `mkdir bytecodeviewer/`
       * `cd bytecodeviewer/`
       * `unzip ../BytecodeViewer.2.9.8.zip`
-      * `mv -i 'BytecodeViewer 2.9.8.jar' ../../util/BytecodeViewer_2.9.8.jar`
+      * `cp -ip 'BytecodeViewer 2.9.8.jar' ../../util/BytecodeViewer_2.9.8.jar`
       * `cd ~/hmcb/`
       * `java -jar util/BytecodeViewer_2.9.8.jar`
         * the first run will download a number of dependencies; subsequent runs are much faster
@@ -116,7 +116,7 @@ One of the first things to do in Minecraft is to craft your craftingtable.  One 
       * `cd ~/hmcb/`
       * `cp -ip hexcraft/utils/javap.pl util/`
       * `cp -ip hexcraft/utils/ReadWriteClass.java util/`
-1. set browser bookmarks for pages the tech specs, references, and numeric converters listed above
+1. set browser bookmarks for the tech specs, references, and numeric converters listed above
 
 
 ### next chapter

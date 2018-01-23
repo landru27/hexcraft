@@ -11,9 +11,11 @@ For this first hack, I will proceed through the steps in some detail.  Later cha
 
 ### unpack the Minecraft .jar file
 
-A .jar file is just a .zip file with a different file extension.  Its contents can be easily extracted with an ordinary Zip utility.
+Both for searching within the Minecraft engine for where to make the change we want to make, and for making that change, we need to deal with the individual .class files that collectively comprise the Minecraft engine.  So, we unpack the Minecraft .jar file.
 
-Both for searching within the Minecraft engine for where to make the change we want to make, and for making that change, we need to deal with the individual .class files that collectively comprise the Minecraft engine.  So, we unpack the Minecraft .jar file.  First, make a working area.  Second, copy in the v1.12.2 .jar from your installation of Minecraft.  Third, unzip it.  Finally, rename it so that later when we put the 1.12.2.jar file back together it does not collide with the original.
+The .jar file format is the same as used for .zip files; the JAR file format is a vaient of the ZIP file format [ref](https://en.wikipedia.org/wiki/Zip_%28file_format%29).  A .jar file's contents can therefore easily be extracted with an ordinary Zip utility.
+
+First, make a working area for this blog chapter.  Second, copy in the v1.12.2 .jar from your installation of Minecraft.  Third, unzip it.  Finally, rename it so that later when we put the 1.12.2.jar file back together it does not collide with the original.
 
 ```
 cd ~/hmcb/craftingtable/
@@ -30,7 +32,7 @@ mv -i 1.12.2.jar 1.12.2.jar--orig
 
 ### find the class file or files involved in the logic to be changed
 
-We begin with a bit of detective work.  We need to think about what it is we want to change about the Minecraft engine, and search the MCP / Forge souce files for candidates.  In doing so, it is useful to search for both (1) likely .java file **names**, and (2) likely .java file **contents**.
+This step takes a bit of detective work.  We need to think about what it is we want to change about the Minecraft engine, and search the MCP / Forge souce files for candidates.  In doing so, it is useful to search for both (1) likely .java file **names**, and (2) likely .java file **contents**.
 
 For hacking creepers' explosion strength, it makes sense to look for source files with 'creeper' in the name, and it makes sense to look for source files with contents related to explosions.  Some searches I used for doing this include:
 
@@ -46,17 +48,19 @@ The `find` command turns up a nice short list of files, and some we can guess ri
 
 In a normal programming life cycle, we'd chage this .java file, recompile it to an updated .class file, rebuild the .jar file, and call it a day.  If we were modding, we'd write a new .java file that would in some way or another override this class variable with a new one.  But we are **hacking**, and bytecode hacking at that.  So we are going to alter the .class file directly.
 
+#### a side trip into obfuscated Java .class files
+
 However!  Mojang obfuscates their Java code as part of their build process, so when we unpack the Minecraft .jar file, we don't see any .class files named anything remotely relating to creepers.  There are some asset files named like that, but unless we just want to change how creepers look, those aren't going to help us.
 
 Thus, we need a way to find the correct .class file.
 
-In non-obfuscated .class files, there are structures that preserve the variable names used in the .java source code, so we could normally search for those in the .class file, or in the output of `strings` on the .class file.  But part of Mojang's obfuscation is to replace every variable name with the unicode snowman character.  In a .class file, variable names are just handy references that tie back to the source code; the .class file has a different way to refer to each variable individually, which we will see more of in later chapters.
+In non-obfuscated .class files, there are structures that preserve the variable names used in the .java source code, so we could normally search for those in the .class file, or in the output of `strings` on the .class file.  But part of Mojang's obfuscation is to replace every variable name with the unicode snowman character.  In a .class file, variable names are just handy references that tie back to the source code; the .class file has a different way to refer to each variable individually, which is why it's safe for Mojang to obfuscate the local variable names.  (Why they chose the snoman glyph, I have no idea.)  We will deal with local variables in more detail in later chapters.
 
 In both non-obfuscated and obfuscated .class files, any use of classes outside of itself must be done with an actual name for that other class, so we could normally search for .class files that make reference to all the classes that show up in `.../entity/monster/EntityCreeper.java`.  But part of Mojang's obfuscation is to obfuscate *all* the class names, so while the references are intact, they refer to other classes that have themselves had their names obfuscated.
 
 We need to search for things relatively unique to our target class file that cannot withstand obfuscation.
 
-After trying several things, I hit upon a few reliable markers.  One of them is the NBT tags that a class makes use of.  NBT data is stored with an ordinary name (the 'N' in NBT) to mark its associated data in the NBT files (usually, .dat files).  The one that works best for the task at hand is "ExplosionRadius".  It stands to reason, as not many things in the Minecraft world have an explosion radius, and it can be confirmed with another grep of the MCP / Forge sources: `grep -rl ExplosionRadius ~/hmcb/forge/modding/build/tmp/recompileMc/sources/net/` finds only one file: the same `.../client/model/ModelCreeper.java` in which we found `private int explosionRadius = 3;`.  Golden.
+After trying several things, I hit upon a few reliable markers.  One of them is the [NBT tags](https://minecraft.gamepedia.com/NBT_format) that a class makes use of.  NBT data is stored with an ordinary name (the 'N' in NBT) to mark its associated data in the NBT files (usually, .dat files).  The one that works best for the task at hand is "ExplosionRadius".  It stands to reason, as not many things in the Minecraft world have an explosion radius, and it can be confirmed with another grep of the MCP / Forge sources: `grep -rl ExplosionRadius ~/hmcb/forge/modding/build/tmp/recompileMc/sources/net/` finds only one file: the same `.../entity/monster/EntityCreeper.java` in which we found `private int explosionRadius = 3;`.  Golden.
 
 Back in `craftingtable/chapter-02-weakened-creepers/', when we `grep ExplosionRadius *` the only .class file listed is `acs.class`.  That file will be the subject of our edits, below.
 
@@ -65,7 +69,7 @@ Back in `craftingtable/chapter-02-weakened-creepers/', when we `grep ExplosionRa
 
 Obfuscated Java .class files are, of course, still quite operable, which means that decompilers can still decompile them.  They still function perfectly logically -- otherwise, they could not execute properly -- they are simply hard for a human to read.  One of the principal tactics used is to rename all classes, methods, and constants with meaningless names.
 
-If you ever thought having meaningful function and variable names was unneccsary, attempting to read some of the decompiled obfuscated code here will convince you otherwise.  As programmers, we really do read source code like a document or even a story.  The program makes sense to us when we can follow the flow.  Reading code where all the classes, methods, constants, and such have been replaced with one- to three-letter names makes the brain **hurt**.  You cannot follow it at all.  When the names of classes, methods, constants, and varibles relate to things we already understand, we can build up a sophisticated and elaborate narrative of what a program is doing.  When the names of things have nothing but internal relationships, while logically sound, we quickly lose track of what that logic is.  Our brains can only keep a handful of things in active memory, so in order to hold in our mind something involved and complex, we need referants whose story we are already familiar with.  Hence the purpose of meaningful class, method, constant, and varible names in ordinary programming.
+If, in your own programming work, you ever thought having clear and meaningful function and variable names was unneccsary, attempting to read some of the decompiled obfuscated code here will convince you otherwise.  As programmers, we really do read source code like a document or even a story.  The program makes sense to us when we can follow the flow.  Reading code where all the classes, methods, constants, and such have been replaced with one- to three-letter names makes the brain **hurt**.  You cannot follow it at all.  When the names of classes, methods, constants, and varibles relate to things we already understand, we can build up a sophisticated and elaborate narrative of what a program is doing.  When the names of things have nothing but internal relationships, while logically sound, we quickly lose track of what that logic is.  Our brains can only keep a handful of things in active memory, so in order to hold in our mind something involved and complex, we need referants whose story we are already familiar with.  Hence the purpose of meaningful class, method, constant, and varible names in ordinary programming.
 
 So, despite the obfuscation, we can decompile the target .class file.  With effort, we can see what it is doing.  Issue: `java -jar ../../util/BytecodeViewer_2.9.8.jar`, and use the File menu to Add 'acs.class'.  The BytecodeViewer inteface is not the most intuitive thing, but one gets the hang of it with some poking around.  By default, BytecodeViewer presents us with two alternative decompilations of our selected class.  One is good for some things, and the other is good for other things.  Together, they tell us a lot about the target .class file.
 
@@ -102,11 +106,11 @@ this.tasks.addTask(3, new EntityAIAvoidEntity(this, EntityOcelot.class, 6.0F, 1.
 
 By the same token we use the MCP / Forge sources to see that the area of code we are interested in is here:
 ```
-private int bx;
-private int by;
-private int bz = 30;
-private int bA = 3;
-private int bB;
+private int bx;       corresponds to  private int lastActiveTime;
+private int by;                       private int timeSinceIgnited;
+private int bz = 30;                  private int fuseTime = 30;
+private int bA = 3;                   private int explosionRadius = 3;
+private int bB;                       private int droppedSkulls;
 ```
 
 That "3" is what we want to change.  It's a small value, and we want to change the "3" to a "1", so it would be reasonable to assume this is a one-byte change to the .class file.  It is indeed a one-byte change, but not perhaps in the way one would predict, and it would be both naive and mis-informed to start looking near the top of the .class file for "0x03" bytes.
