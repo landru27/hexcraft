@@ -16,7 +16,7 @@ A .jar file is just a .zip file with a different file extension.  Its contents c
 Both for searching within the Minecraft engine for where to make the change we want to make, and for making that change, we need to deal with the individual .class files that collectively comprise the Minecraft engine.  So, we unpack the Minecraft .jar file.  First, make a working area.  Second, copy in the v1.12.2 .jar from your installation of Minecraft.  Third, unzip it.  Finally, rename it so that later when we put the 1.12.2.jar file back together it does not collide with the original.
 
 ```
-cd ~/hexcraft-blog/minecraft/craftingtable/
+cd ~/hmcb/craftingtable/
 mkdir chapter-02-weakened-creepers/
 cd    chapter-02-weakened-creepers/
 
@@ -35,9 +35,9 @@ We begin with a bit of detective work.  We need to think about what it is we wan
 For hacking creepers' explosion strength, it makes sense to look for source files with 'creeper' in the name, and it makes sense to look for source files with contents related to explosions.  Some searches I used for doing this include:
 
 ```
-find                ~/hexcraft-blog/minecraft/forge/modding/build/tmp/recompileMc/sources/net/ | grep -i creeper
-grep -ril explosion ~/hexcraft-blog/minecraft/forge/modding/build/tmp/recompileMc/sources/net/
-grep -ril explod    ~/hexcraft-blog/minecraft/forge/modding/build/tmp/recompileMc/sources/net/
+find                ~/hmcb/forge/modding/build/tmp/recompileMc/sources/net/ | grep -i creeper
+grep -ril explosion ~/hmcb/forge/modding/build/tmp/recompileMc/sources/net/
+grep -ril explod    ~/hmcb/forge/modding/build/tmp/recompileMc/sources/net/
 ```
 
 The `find` command turns up a nice short list of files, and some we can guess right away have nothing to do with behavior (e.g., `.../client/model/ModelCreeper.java` and `.../client/renderer/entity/RenderCreeper.java` both seem more related to appearance).  There are a great many files with 'explosion', but fewer with 'explod'.  The file `.../entity/monster/EntityCreeper.java` shows up in all three lists, and sounds like a fine place to at least start ...
@@ -56,7 +56,7 @@ In both non-obfuscated and obfuscated .class files, any use of classes outside o
 
 We need to search for things relatively unique to our target class file that cannot withstand obfuscation.
 
-After trying several things, I hit upon a few reliable markers.  One of them is the NBT tags that a class makes use of.  NBT data is stored with an ordinary name (the 'N' in NBT) to mark its associated data in the NBT files (usually, .dat files).  The one that works best for the task at hand is "ExplosionRadius".  It stands to reason, as not many things in the Minecraft world have an explosion radius, and it can be confirmed with another grep of the MCP / Forge sources: `grep -rl ExplosionRadius ~/hexcraft-blog/minecraft/forge/modding/build/tmp/recompileMc/sources/net/` finds only one file: the same `.../client/model/ModelCreeper.java` in which we found `private int explosionRadius = 3;`.  Golden.
+After trying several things, I hit upon a few reliable markers.  One of them is the NBT tags that a class makes use of.  NBT data is stored with an ordinary name (the 'N' in NBT) to mark its associated data in the NBT files (usually, .dat files).  The one that works best for the task at hand is "ExplosionRadius".  It stands to reason, as not many things in the Minecraft world have an explosion radius, and it can be confirmed with another grep of the MCP / Forge sources: `grep -rl ExplosionRadius ~/hmcb/forge/modding/build/tmp/recompileMc/sources/net/` finds only one file: the same `.../client/model/ModelCreeper.java` in which we found `private int explosionRadius = 3;`.  Golden.
 
 Back in `craftingtable/chapter-02-weakened-creepers/', when we `grep ExplosionRadius *` the only .class file listed is `acs.class`.  That file will be the subject of our edits, below.
 
