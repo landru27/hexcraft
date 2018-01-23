@@ -13,7 +13,7 @@ For this first hack, I will proceed through the steps in some detail.  Later cha
 
 Both for searching within the Minecraft engine for where to make the change we want to make, and for making that change, we need to deal with the individual .class files that collectively comprise the Minecraft engine.  So, we unpack the Minecraft .jar file.
 
-The .jar file format is the same as used for .zip files; the JAR file format is a vaient of the ZIP file format [ref](https://en.wikipedia.org/wiki/Zip_%28file_format%29).  A .jar file's contents can therefore easily be extracted with an ordinary Zip utility.
+The .jar file format is the same as used for .zip files; the JAR file format is a vaient of the [ZIP file format](https://en.wikipedia.org/wiki/Zip_%28file_format%29).  A .jar file's contents can therefore easily be extracted with an ordinary Zip utility.
 
 First, make a working area for this blog chapter.  Second, copy in the v1.12.2 .jar from your installation of Minecraft.  Third, unzip it.  Finally, rename it so that later when we put the 1.12.2.jar file back together it does not collide with the original.
 
@@ -175,8 +175,64 @@ Like with `ldc` and `invokevirtual`, `putfield` takes a reference to the constan
 So, in order to change the "3" to a "1", we do indeed need to make a 1-byte change, ...  But we need to change the `06` for `iconst_3` to `04` for `iconst_1`.  That will push a '1' onto the stack, which `putfield` will pop and store in `acs.bA`.
 
 
-### alter the bytecode (dump the class file to text-hex, edit, and reconstitute into binary)
+### alter the bytecode
 
+All files are "binary files", in the sense that all files are stored as bytes, each byte made up of 8 bits, each bit having 2 possible values.  But, colloquially, we make a distinction between "plain-text" files and "binary" files.  Text editors such as `vi`, `emacs`, the editor in most IDEs, and so forth deal just fine with plain-text files, because source code is generally written in plain text.  Executable files, on the other hand, are so-called binary files, which really just means that the bytes that comprise them aren't meant for human consumption.  This is all for good reason, of course: low-level instructions encoded as opcodes emphasizes storage and execution efficiency, and high-level instructions encoded as human-language words and syntax emphasizes developer/development efficiency.
+
+Java .class files of course are in the low-level, "binary" camp, so to edit them, we need to bridge the gap between plain-text editing and binary files.  There are a number of ways to do this.  I chose a method that focuses on being universal and scriptable (at least in part).  The method I present here has these basic steps:
+
+1. dump the .class file to a plain-text representation of its bytes
+1. use an ordinary text editor to search for the bytes to be edited
+1. use an ordinary text editor to modify the (representation of) those bytes
+1. transform the plain-text representation back into actual bytes as a new .class file
+
+The Linux utility `xxd` is the workhorse here.  It translates a file's actual bytes into various textual representations of those bytes.  (Just in case it's not clear, by "textual representation" I simply mean the difference we see between a byte whose value is '0', and the byte for representing the character '0', a byte with a decimal value of '48'.)  We'll use hexadecimal representation, because the other tools and references we are using deal with Java bytecodes in terms of their hexadecimal values.  Of course, a file's byte values can be represented in any base -- they are just numbers.  But hexadecimal is a very common and very handy encoding for byte values.
+
+The full set of steps I use includes some steps to make safety copies, and to make copies we can use for `diff` comparisons.
+
+Here are the steps for nerfing creeprs, based on what we found above:
+```
+cd ~/hmcb/craftingtable/chapter-02-weakened-creepers/
+
+## make some safety and comparison copies
+cp  -ip        acs.class      /tmp/acs.class.orig
+xxd -p         acs.class  - > /tmp/acs.class.orig--xxd
+
+## copy the original to a new file we will edit
+cp  -ip                       /tmp/acs.class.orig--xxd  /tmp/acs.class.next--xxd
+
+## use the text editor of your choice, tho I don't know why anyone would choose anything other than vi ...
+vi        /tmp/acs.class.next--xxd
+
+## search for the bytes that encode the logic you want to change;
+## in this case, those bytes are : 2a 10 1e b5 00 17 2a 06 b5 00 19
+## in vi, '/' is the search command, so:
+/2a101eb500172a06b50019
+## ... except that the bytes we want might cross a line-wrapping boundary,
+## so it might be necessary to do partial searches; in this case:
+/2a101eb50017
+## does the trick; confirm this by looking at the start of the next line
+## for the rest of the target string of bytes
+
+##
+## !!! also always search repeatedly for the target string of bytes !!!
+## by chance, the same bytes might occur elsewhere, too, and you don't
+## want to edit the wrong set of bytes!
+##
+
+## position the cursor over the '06', and change it to an '04', resulting in:
+2a101eb500172a04b50019
+
+## save-and-quit out of your editor, then turn the edited bytes back into a 'binary' file
+xxd -p -r /tmp/acs.class.next--xxd - > /tmp/acs.class.next
+
+## here we can run some diffs to see the effect of our edit
+diff /tmp/acs.class.orig--xxd    /tmp/acs.class.next--xxd
+diff <(od -A x -t x1 acs.class)  <(od -A x -t x1 /tmp/acs.class.next)
+
+## finally, copy the edited .class file into place, overwriting the original
+cp -ip  /tmp/acs.class.next  acs.class
+```
 
 
 ### repackage the Minecraft .jar file
